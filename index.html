@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Password Hashing in PHP</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script type="text/javascript" src="assets/js/jquery.js"></script>
+        <script type="text/javascript" src="assets/js/jquery.mobile.js"></script>
+        <script type="text/javascript" src="assets/js/jquery.tools.js"></script>
+        <script type="text/javascript" src="assets/js/jquery.hashchange.js"></script>
+        <script type="text/javascript" src="assets/js/markdown.js"></script>
+        <script type="text/javascript" src="assets/js/prettify.js"></script>
+
+
+
+        <script type="text/javascript" src="assets/js/slides.js"></script>
+        <link href="assets/css/master.css" rel="stylesheet" type="text/css"></link>
+        <link href="assets/css/prettify.css" rel="stylesheet" type="text/css"></link>
+
+    </head>
+    <body>
+        <div class="window">
+            <div class="slider">
+                <div class="markdown title" title="Home">
+                    Password Hashing
+                    ===============
+                    In PHP
+                    =========== 
+                </div>
+                <div class="markdown List" title="Why Hash Passwords">
+                    ## Why Hash Passwords?
+                    * Think Of Your Users
+                        * How would you like it?
+                    * It's Responsible
+                        * Be a good netizen
+                    * It's Diligent
+                        * Not doing it can be neglegent
+                        * Can bring legal liability
+                        * Can bring criminal liability
+                </div>
+                <div class="markdown title" title="Attack Vectors">
+                    Attack Vectors
+                    ==============
+                </div>
+                <div class="markdown List" title="Rainbow Tables">
+                    ## Rainbow Tables
+                    * A Time/Space Tradeoff
+                        * Pre-compute hashes and store them
+                        * A "chain" of hashes to reduce storage
+                        * VERY fast
+                            * Typically on the scale of seconds
+                    * Defense
+                        * Defeated by a simple salt
+                </div>
+                <div class="markdown List" title="Brute Forcing">
+                    ## Brute Forcing
+                    * Time Inefficent
+                    * Faster than you'd think
+                        * CPU:
+                            * md5: 33 million per second
+                            * sha256: 20 million per second
+                        * GPU ($1600 USD):
+                            * md5: 15 billion per second
+                            * sha256: 11 billion per second
+                </div>
+                <div class="markdown List" title="Brute Forcing 2">
+                    ## Brute Forcing - Perspective
+                    * *All* 6 Char Passwords:
+                        * CPU: 5 Hours
+                        * GPU: 45 Seconds
+                    * *All* 7 Char Passwords:
+                        * CPU: 22 Days
+                        * GPU: 1 Hour 12 Minutes
+                    * Entire English Language (all cases)
+                        * CPU: 0.166 Seconds
+                        * GPU: 0.000365 Seconds
+                </div>
+                <div class="markdown List" title="Brute Forcing 3">
+                    ## "Strong Passwords":
+                    * "correct horse battery staple":
+                        * CPU: 80 Years
+                        * GPU: 64 Days
+                    * *All* 10 Char Passwords:
+                        * CPU: 51755 Years
+                        * GPU: 113 Years
+                    * *All* 26 Char Passwords:
+                        * GPU: 300,000,000,000,000,000,000,000 
+                        * Times The Age Of the Universe
+                </div>
+                <div class="markdown title" title="Hashing">
+                    ## Hashing Algorithms
+                </div>
+                <div class="markdown List" title="Don't Do This">
+                    ## Very Bad!!!
+                    * Raw Hash:
+
+                            md5($password);
+                            sha1($password);
+                            hash('sha512', $password);
+                    
+                    * Vulnerable To:
+                        * Rainbow Tables
+                        * Brute Forcing
+                </div>
+                <div class="markdown List" title="Don't Do This Either">
+                    ## Still Bad
+                    * Salted Hash:
+                    
+                            md5($password . $salt);
+                            sha1($password . $salt);
+                            hash('sha512', $password . $salt);
+
+                    * Vulnerable To:
+                        * Brute Forcing
+                </div>
+                <div class="markdown List" title="Do This!">
+                    ## Best Case
+                    * Slow Algorithm
+
+                            crypt($password, $salt);
+                            pbkdf2($password, $salt, $i);
+                            password_hash(
+                                $password, 
+                                PASSWORD_BCRYPT
+                            );
+                            $passLib-&gt;hash($password);
+                            $phpass-&gt;hashPassword($pass);
+                </div>
+                <div class="markdown List" title="Cost Parameter">
+                    ## Cost Parameter
+                    * Target: 0.25 Seconds
+                        * As slow as you can afford
+                    * Depends on hardware
+                        * Test it!
+                    * Good Defaults:
+                        * BCrypt: 10
+                        * PBKDF2: 10000
+                </div>
+                <div class="markdown title" title="Demo">
+                    Demo Time
+                    =========
+                </div>
+                <div class="markdown title" title="Password Hashing">
+                    Simplified
+                    ==========
+                    Password Hashing
+                    ================
+                </div>
+                <div class="markdown List api" title="New API">
+                    ## New API for 5.5
+                    * string **password_hash**($pass, $algo, array $options = array())
+                        * Generates salt, hashes password using algo
+                    * bool **password_verify**($pass, $hash)
+                        * Verifies hash and password, returns boolean
+                    * bool **password_needs_rehash**($hash, $algo, $options = array())
+                        * Determines if the hash is the same as specified by algo
+                    * array **password_get_info**($hash)
+                        * Returns an array of information about the hash
+                </div>
+                <div class="markdown code" title="Example">
+                    ## Example
+
+                        function register($user, $password) {
+                            $hash = password_hash($password, PASSWORD_BCRYPT);
+                            $this-&gt;store($user, $hash);
+                        }
+
+                        function login($user, $password) {
+                            $hash = $this-&gt;fetchHash($user);
+
+                            if (password_verify($password, $hash)) {
+
+                                if (password_needs_rehash($hash, PASSWORD_BCRYPT)) {
+
+                                    $hash = password_hash($password, PASSWORD_BCRYPT);
+                                    $this-&gt;store($user, $hash);
+                                }
+
+                                $this-&gt;startSession();
+                                return true;
+                            }
+                            return false;
+                        }
+                </div>
+                <div class="markdown List" title="Resources">
+                    ## Resources
+                    * PHP 5.5 API
+                        * wiki.php.net/rfc/password_hash
+                    * Password Compat
+                        * PHP 5.5 Compatibility
+                        * github/ircmaxell/password_compat
+                    * PasswordLib
+                        * 5.3+, Multiple Algorithms, Portable
+                        * github/ircmaxell/PHP-PasswordLib
+                    * PHPASS
+                        * PHP 4+
+                        * openwall.com/phpass
+                </div>
+                <div class="markdown List comments" title="Comments">
+                    1. Questions?
+                    2. Comments?
+                    3. Snide Remarks?
+                </div>
+                <div class="markdown credits" title="Credits">
+                    ## Anthony Ferrara
+                    ## @ircmaxell
+                    ## blog.ircmaxell.com
+                    ## me@ircmaxell.com
+                </div>
+            </div>
+        </div>
+        <div class="pagination">
+            <form>
+                <select>
+                </select>
+            </form>
+        </div>
+    </body>
+</html>
