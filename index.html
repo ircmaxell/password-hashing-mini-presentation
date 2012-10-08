@@ -58,33 +58,51 @@
                         * CPU:
                             * md5: 33 million per second
                             * sha256: 20 million per second
+                            * bcrypt: 90 per second
                         * GPU ($1600 USD):
                             * md5: 15 billion per second
                             * sha256: 11 billion per second
+                        * EC2 ($1500 USD per Month):
+                            * sha256: 205 million per second
+                            * bcrypt: 3200 per second
                 </div>
                 <div class="markdown List" title="Brute Forcing 2">
                     ## Brute Forcing - Perspective
-                    * *All* 6 Char Passwords:
+                    * *All* 6 Char Passwords (md5):
                         * CPU: 5 Hours
                         * GPU: 45 Seconds
-                    * *All* 7 Char Passwords:
+                    * *All* 7 Char Passwords (md5):
                         * CPU: 22 Days
                         * GPU: 1 Hour 12 Minutes
                     * Entire English Language (all cases)
-                        * CPU: 0.166 Seconds
-                        * GPU: 0.000365 Seconds
+                        * CPU: 1.8 Seconds
+                        * GPU: 0.004 Seconds
                 </div>
                 <div class="markdown List" title="Brute Forcing 3">
                     ## "Strong Passwords":
-                    * "correct horse battery staple":
+                    * "correct horse battery staple" (md5):
                         * CPU: 80 Years
                         * GPU: 64 Days
-                    * *All* 10 Char Passwords:
+                    * *All* 10 Char Passwords (md5):
                         * CPU: 51755 Years
                         * GPU: 113 Years
-                    * *All* 26 Char Passwords:
-                        * GPU: 300,000,000,000,000,000,000,000 
-                        * Times The Age Of the Universe
+                    * *All* 26 Char Passwords (md5):
+                        * GPU: 4e33 Years
+                            * 300,000,000,000,000,000,000,000 
+                            * Times The Age Of the Universe
+                </div>
+                <div class="markdown List" title="Brute Forcing 3">
+                    ## Brute Focing Bcrypt:
+                    * All 6 Char Passwords:
+                        * CPU: 243 Years, EC2: 7 Years
+                    * All 7 Char Passwords:
+                        * CPU: 22k Years, EC2: 642 Years
+                    * Entire English Language (all cases)
+                        * CPU: 8 Days, EC2: 5 Hours
+                    * "correct horse battery staple":
+                        * CPU: 29B Years, EC2: 827M Years
+                    * All 26 Char Passwords:
+                        * CPU: 7e41 Years, 2e40 Years
                 </div>
                 <div class="markdown title" title="Hashing">
                     ## Hashing Algorithms
